@@ -2,7 +2,8 @@
 import '../styles/App.scss';
 // IMG
 // import logo from '../images/logo.svg';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import getWord from '../services/fetch';
 
 function App() {
   //eventos y estados
@@ -17,7 +18,14 @@ function App() {
   const [lastLetter, setLastLetter] = useState('');
   const [solution, setSolution] = useState([]);
   const [fail, setFail] = useState([]);
-  const [word, setWord] = useState('katakroker');
+
+  //fetch
+  const [word, setWord] = useState('word', []);
+  useEffect(() => {
+    getWord().then((datafromAPI) => {
+      setWord(datafromAPI);
+    });
+  });
 
   const handleInput = (ev) => {
     const newValue = ev.target.value;
