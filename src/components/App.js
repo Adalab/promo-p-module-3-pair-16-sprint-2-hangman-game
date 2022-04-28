@@ -8,11 +8,6 @@ import getWord from '../services/fetch';
 function App() {
   //eventos y estados
   const [numberOfErrors, setNumberOfErrors] = useState(0);
-  const handleClick = (ev) => {
-    ev.preventDefault();
-    setNumberOfErrors(numberOfErrors + 1);
-    console.log('holi');
-  };
 
   //form
   const [lastLetter, setLastLetter] = useState('');
@@ -20,12 +15,12 @@ function App() {
   const [fail, setFail] = useState([]);
 
   //fetch
-  const [word, setWord] = useState('word', []);
+  const [word, setWord] = useState('');
   useEffect(() => {
     getWord().then((datafromAPI) => {
-      setWord(datafromAPI);
+      setWord(datafromAPI.word);
     });
-  });
+  }, []);
 
   const handleInput = (ev) => {
     const newValue = ev.target.value;
@@ -34,16 +29,15 @@ function App() {
 
     if (newValue.match('[a-zA-ZñÑ]') === null) {
       //isValid = false;
-      console.log('Letra no valida', newValue);
+      console.log('Letra no válida', newValue);
     } else {
       if (word.includes(newValue)) {
         //solution.push(newValue);
         setSolution([...solution, newValue]);
-        console.log('se mete en soluciones');
       } else {
         //fail.push(newValue);
         setFail([...fail, newValue]);
-        console.log('se mete en fail');
+        setNumberOfErrors(numberOfErrors + 1);
       }
     }
   };
@@ -78,10 +72,6 @@ function App() {
     <div className='page'>
       <header>
         <h1 className='header__title'>Juego del ahorcado</h1>
-
-        <button className='btn' type='button' onClick={handleClick}>
-          Incrementar
-        </button>
       </header>
       <main className='main'>
         <section>
