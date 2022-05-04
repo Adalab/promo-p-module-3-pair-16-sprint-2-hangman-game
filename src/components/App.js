@@ -1,45 +1,39 @@
 import { useEffect, useState } from 'react';
+import { Routes, Route } from 'react-router-dom';
 //Componets//
 import Header from './Header';
 import Dummy from './Dummy';
 import SolutionLetters from './SolutionLetters';
 import ErrorLetters from './ErrorLetters';
+import Form from './Form';
+import Footer from './Footer';
+import Instructions from './Instructions';
+import Loading from './Loading';
+import Options from './Options';
 // api
 import getWordFromApi from '../services/Api';
 // styles
 import '../styles/App.scss';
-import '../styles/components/Dummy.scss';
-import '../styles/components/Letters.scss';
-import '../styles/components/Form.scss';
-import '../styles/components/Header.scss';
 
 function App() {
   const [word, setWord] = useState('');
   const [userLetters, setUserLetters] = useState([]);
   const [lastLetter, setLastLetter] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    setLoading(true);
     getWordFromApi().then((word) => {
       setWord(word);
+      setLoading(false);
     });
   }, []);
 
   // events
-
-  const handleKeyDown = (ev) => {
-    // Sabrías decir para qué es esta línea
-    ev.target.setSelectionRange(0, 1);
-  };
-
-  const handleChange = (ev) => {
-    let re = /[a-zA-Z]/; //add regular pattern - lesson 3.3 exercise 2
-    if (re.test(ev.target.value)) {
-      handleLastLetter(ev.target.value);
-    }
-  };
-
-  const handleSubmit = (ev) => {
-    ev.preventDefault();
+  const handleWord = (value) => {
+    setWord(value);
+    setUserLetters([]);
+    setLastLetter('');
   };
 
   const getNumberOfErrors = () => {
@@ -47,32 +41,6 @@ function App() {
       (letter) => word.includes(letter) === false
     );
     return errorLetters.length;
-  };
-
-  const renderSolutionLetters = () => {
-    const wordLetters = word.split('');
-    return wordLetters.map((letter, index) => {
-      const exists = userLetters.includes(letter.toLocaleLowerCase());
-      return (
-        <li key={index} className='letter'>
-          {exists ? letter : ''}
-        </li>
-      );
-    });
-  };
-
-  const renderErrorLetters = () => {
-    const errorLetters = userLetters.filter(
-      (letter) =>
-        word.toLocaleLowerCase().includes(letter.toLocaleLowerCase()) === false
-    );
-    return errorLetters.map((letter, index) => {
-      return (
-        <li key={index} className='letter'>
-          {letter}
-        </li>
-      );
-    });
   };
 
   const handleLastLetter = (value) => {
@@ -90,29 +58,20 @@ function App() {
       <Header />
       <main className='main'>
         <section>
-          <SolutionLetters renderSolutionLetters={renderSolutionLetters} />
-          <ErrorLetters renderErrorsLetters={renderErrorLetters} />
-
-          <form className='form' onSubmit={handleSubmit}>
-            <label className='title' htmlFor='last-letter'>
-              Escribe una letra:
-            </label>
-            <input
-              autoFocus
-              autoComplete='off'
-              className='form__input'
-              maxLength='1'
-              type='text'
-              name='last-letter'
-              id='last-letter'
-              value={lastLetter}
-              onKeyDown={handleKeyDown}
-              onChange={handleChange}
+          <SolutionLetters word={word} userLetters={userLetters} />
+          <ErrorLetters word={word} userLetters={userLetters} />
+          <Form handleLastLetter={handleLastLetter} lastLetter={lastLetter} />
+          <Routes>
+            <Route path='/instructions' element={<Instructions />} />
+            <Route
+              path='/options'
+              element={<Options word={word} handleWord={handleWord} />}
             />
-          </form>
+          </Routes>
         </section>
         <Dummy numberOfErrors={getNumberOfErrors()} />
       </main>
+      <Footer />
     </div>
   );
 }

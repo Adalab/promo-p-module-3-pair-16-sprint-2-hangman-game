@@ -1,6 +1,12 @@
+import '../styles/components/Dummy.scss';
 function Dummy(props) {
+  const maxNumberOfErrors = 13;
+  const numberOfErrors =
+    props.numberOfErrors > maxNumberOfErrors
+      ? maxNumberOfErrors
+      : props.numberOfErrors;
   return (
-    <section className={`dummy error-${props.numberOfErrors}`}>
+    <section className={`dummy error-${numberOfErrors}`}>
       <span className='error-13 eye'></span>
       <span className='error-12 eye'></span>
       <span className='error-11 line'></span>
